@@ -1,0 +1,55 @@
+.inte-Card--Media{
+    display: flex;
+    justify-content: center;
+}
+.inte-Card--Media img{
+    height: 230px;
+    width: 225px;
+}
+.mycard{
+    max-width: 230px !important;
+}
+@media screen and (max-width: 600px){
+    .inte-Card--Media img{
+        height: 120px;
+        width: 120px;
+    }
+}
+.addtocart{
+margin: 10px 0px;
+border-radius: 5px;
+border:none;
+width: 100%;
+padding: 10px 15px;
+font-weight: 800;
+background-color: rgb(87, 192, 122);
+color: white;
+}
+.wrapper{
+    display: flex;
+    justify-content: center;
+}
+.wrapper_card{
+    padding:30px 5% !important;
+}
+.list-group-item{
+    list-style:none ;
+    font-size: 15px;
+}
+.me-1{
+margin-right: 8px;
+}
+.form-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 15px;
+}
+option{
+    background-color: white;
+}
+.form-check-input{
+    min-width: 18px;
+    min-height: 18px;
+}
