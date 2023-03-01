@@ -5,16 +5,17 @@ import {
   FlexChild,
   FlexLayout,
 } from "@cedcommerce/ounce-ui";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import { filteredData } from "./database";
 
-const Body = ({cart,setCart}) => {
+const Body = ({cart,cartHandler}) => {
   const data = filteredData();
   const [state, setState] = useState({ searchInput: "", products: data ,cart:[]});
   let [filter, setFilter] = useState({});
   let selectSort = useRef(null);
   let formref=useRef(null)
+  // store filter key objects values in filter state
   const filterHandler = (key, val) => {
     let currentFilter = filter;
     if (currentFilter[key]) {
@@ -96,18 +97,7 @@ const Body = ({cart,setCart}) => {
     state.products.sort(sortLogic);
     setState({ ...state, products: [...state.products] });
   };
-  // set products according to filter
-  // useEffect(() => {
-  //   let flg = false;
-  //   Object.keys(filter).forEach((check) => {
-  //     if (filter[check].length > 0) flg = true;
-  //   });
-  //   if (flg)
-  //     setState({ ...state, products: [...filterer(Object.keys(filter))] });
-  //   else {
-  //     setState({ ...state, products: [...data] });
-  //   }
-  // }, [filter]);
+//  when use want to apply filter after give all selections
   const filterhit=()=>{
     let flg = false;
     Object.keys(filter).forEach((check) => {
@@ -298,12 +288,18 @@ const Body = ({cart,setCart}) => {
                             {" " + x.price}
                           </h3>
                         </div>
-                        <button className="addtocart" onClick={()=>{cart.push(x);setCart(cart)}}>ADD TO CART</button>
+                        <button className="addtocart" onClick={()=>{cartHandler(x)}}>ADD TO CART</button>
                       </Card>
                     </div>
                   ))
                 ) : (
-                  <h2 style={{ color: "orenge" }}>No Products Found</h2>
+                  // in case no products available for filter
+                  <Card
+  alt="Natutre"
+  cardType=""
+  media="no-products-removebg-preview.png"
+  title=""
+/>
                 )}
               </FlexLayout>
             </div>

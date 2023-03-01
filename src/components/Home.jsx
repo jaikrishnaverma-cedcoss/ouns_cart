@@ -1,13 +1,49 @@
-import { ButtonDropdown, Topbar } from "@cedcommerce/ounce-ui";
+import { Button, ButtonDropdown, Topbar } from "@cedcommerce/ounce-ui";
 import React from "react";
 import { useState } from "react";
 import Body from "./Body";
 import Cart from "./Cart";
+import useIndex from "./customHook/useIndex";
 import { filteredData } from "./database";
 
 const Home = () => {
   const data = filteredData();
   const [state, setState] = useState({ navigate: true ,cart:[]});
+  const getIndex=useIndex()
+
+  // handle cart and manage cart products with rspect to stocks also manage cart quantity incr/decr 
+  const cartHandler=(prod , type='inc')=>{
+    let index = getIndex(data , 'id' , prod.id)
+    let indexInCart = state.cart.findIndex(
+      (item) => item.id == prod.id
+    );
+    if (indexInCart == -1) {
+      state.cart.push({...prod,
+        quantity: 1,
+        total: prod.price,
+      });
+    } else if (
+      !(
+        (type === "inc" &&
+          state.cart[indexInCart].quantity + 1 > data[index].stock) ||
+        (type === "dec" && state.cart[indexInCart].quantity - 1 < 0)
+      )
+    ) {
+      state.cart[indexInCart].quantity =
+        type == "inc"
+          ? state.cart[indexInCart].quantity + 1
+          : state.cart[indexInCart].quantity - 1;
+      state.cart[indexInCart].total =
+        state.cart[indexInCart].price * state.cart[indexInCart].quantity;
+    }
+    state.cart.forEach((item,i)=>{
+       if(item.quantity==0)
+       state.cart.splice(i,1)
+    })
+  
+    setState({...state,cart:[...state.cart]});
+  }
+  // navbar left div jsx
   const connectLeft = () => {
     return (
       <div className="logo" style={{ fontWeight: "900", fontSize: "30px" }} onClick={()=>setState({...state,navigate:true})}>
@@ -17,73 +53,25 @@ const Home = () => {
           alt="productpage"
           style={{ marginRight: "10px" }}
         />
-        World
+        Shop
       </div>
     );
   };
+    // navbar right div jsx
   const connectRight = () => {
     return (
       <>
-        <ButtonDropdown
-          content=""
-          halign="Equal"
-          icon={<i className="bi bi-person-circle"></i>}
-          iconAlign="left"
-          list={[
-            {
-              icon: <i width="20px" className="bi bi-cart-fill"></i>,
-              label: "My Cart",
-              onClick: ()=>setState({...state,navigate:false}),
-            },
-            {
-              icon: (
-                <svg
-                  className="css-i6dzq1"
-                  fill="none"
-                  height="20"
-                  stroke="#8F8F8F"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  width="20"
-                >
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" x2="9" y1="12" y2="12" />
-                </svg>
-              ),
-              label: "Item 2",
-              onClick: function noRefCheck() {},
-            },
-            {
-              icon: (
-                <svg
-                  className="feather feather-chevron-down"
-                  fill="none"
-                  height="24"
-                  stroke="#0A0A0A"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              ),
-              label: "Item 3",
-              onClick: function noRefCheck() {},
-            },
-          ]}
-          onAction={function noRefCheck() {}}
-          onClick={function noRefCheck() {}}
-          popoverContainer="body"
-          thickness="thin"
-          title="Profile"
-          type="Primary"
-        />
+          <Button
+    content={<><i width="20px" className="bi bi-cart-fill"> {state.cart.length}</i></>}
+    halign="Equal"
+    iconAlign="left"
+    length="none"
+    onAction={function noRefCheck(){}}
+    onClick={()=>setState({...state,navigate:false})}
+    tabIndex="1"
+    thickness="thin"
+    type="Primary"
+  />
       </>
     );
   };
@@ -93,8 +81,8 @@ const Home = () => {
         <Topbar connectLeft={connectLeft()} connectRight={connectRight()} />
       </header>
       <main style={{paddingTop:'70px'}}>
-        {state.navigate ? <Body cart={state.cart} setCart={(cart)=>setState({...state,cart:[...cart]})}/>
-         : <Cart cart={state.cart} setCart={(cart)=>setState({...state,cart:[...cart]})}/>}
+        {state.navigate ? <Body cart={state.cart} cartHandler={(cart)=>cartHandler(cart)}/>
+         : <Cart cart={state.cart}  setCart={(cart)=>setState({...state,cart:[...cart]})} cartHandler={cartHandler}/>}
         </main>
       <footer></footer>
     </>
